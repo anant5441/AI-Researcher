@@ -1,4 +1,4 @@
-Agentic AI Researcher 🤖📑
+# Agentic AI Researcher 🤖📑
 
 An autonomous research assistant that searches arXiv, reads PDFs, reasons with an LLM, and writes a structured LaTeX paper compiled to PDF.
 
