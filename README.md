@@ -1,103 +1,108 @@
 Agentic AI Researcher 🤖📑
 
-An AI-powered autonomous research assistant that retrieves academic papers, analyzes them, and writes a structured research paper in PDF format.
+An autonomous research assistant that searches arXiv, reads PDFs, reasons with an LLM, and writes a structured LaTeX paper compiled to PDF.
 
-🚀 Features
+### 🚀 Features
+- Search recent papers on arXiv
+- Extract text from PDFs (PyPDF2)
+- Reasoning and drafting with LLMs (Gemini / others via LangChain)
+- One-click PDF generation from LaTeX (Tectonic)
+- Streamlit chat UI
 
-Accepts a research topic from the user.
+### 🛠️ Tech Stack
+- **Frontend**: `streamlit`
+- **Orchestration**: `langchain`, `langgraph`
+- **LLM**: `langchain-google-genai` (Gemini)
+- **PDF**: `PyPDF2` (reading), `tectonic` (LaTeX → PDF)
+- **Papers API**: arXiv Atom API
 
-Retrieves relevant academic papers using arXiv API.
+## Prerequisites
+- Python ≥ 3.13 (see `.python-version` / `pyproject.toml`)
+- A Google API key for Gemini: set `GOOGLE_API_KEY`
+- LaTeX engine: `tectonic` (required at runtime to compile PDFs)
 
-Reads and extracts information from PDFs using PyPDF2.
+Install Tectonic on Windows:
+- With Scoop: `scoop install tectonic`
+- With Chocolatey: `choco install tectonic`
+- Or download from the official site: `https://tectonic-typesetting.github.io/`
 
-Performs research and generates insights using LLMs (OpenAI, Gemini, Groq).
+## Setup
+You can use `uv` (recommended, lockfile provided) or `pip`.
 
-Writes and formats the final research paper into a downloadable PDF.
+Using uv:
+```bash
+uv sync
+```
 
-User-friendly Streamlit frontend for interaction.
+Using pip:
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r <(uv pip compile pyproject.toml)
+```
 
-🏗️ Technical Architecture
+Environment variables (create `.env` in project root):
+```bash
+GOOGLE_API_KEY=your_gemini_api_key
+```
 
-<!-- You can replace with your uploaded diagram -->
+## Running
+### 1) Streamlit UI
+```bash
+streamlit run frontend.py
+```
+Interacts via chat, searches arXiv, reads PDFs, and can render a paper to PDF.
 
-User Input (Streamlit UI): User provides a research topic.
+### 2) CLI (simple loop)
+There are two variants:
+- `ai_researcher.py`: ReAct agent using `create_react_agent`
+- `ai_researcher2.py`: Custom LangGraph with tool routing
 
-AI Agent (LangGraph + LLMs): Orchestrates the research workflow.
+Run either script and type a topic or instruction when prompted:
+```bash
+python ai_researcher.py
+# or
+python ai_researcher2.py
+```
 
-Tools:
+## Output
+Generated files are saved in the `output/` directory, e.g.:
+- `paper_YYYYMMDD_HHMMSS.tex`
+- `paper_YYYYMMDD_HHMMSS.pdf`
 
-Browse articles
+## Project Structure (high level)
+- `arxiv_tool.py`: arXiv search tool and XML parsing
+- `read_pdf.py`: Reads remote PDFs and extracts text (PyPDF2)
+- `write_pdf.py`: Renders LaTeX to PDF via Tectonic
+- `ai_researcher.py`: ReAct-style agent wiring
+- `ai_researcher2.py`: LangGraph agent with tool routing and memory
+- `frontend.py`: Streamlit chat interface
+- `output/`: Generated `.tex` and `.pdf`
 
-Scrape & analyze papers (arXiv + PyPDF2)
+## Troubleshooting
+- Tectonic not found / PDF not generated
+  - Ensure `tectonic` is installed and on PATH. Run `tectonic --version`.
+  - Windows: install via Scoop (`scoop install tectonic`) or Chocolatey (`choco install tectonic`).
 
-Perform research reasoning
+- arXiv search returns no results
+  - The tool forbids certain characters `()" ` in queries. Try a simpler topic.
 
-Publish structured paper as PDF
+- PDF text extraction is incomplete
+  - Some PDFs are scanned or have complex layouts. Results may vary with PyPDF2.
 
-Output: Downloadable Research Paper (PDF).
+- Streamlit shows no responses
+  - Check `.env` contains a valid `GOOGLE_API_KEY`.
+  - Watch terminal logs for tool calls and errors.
 
-⚙️ Code Setup
-Phase 1: Setup AI Agent & Tools
 
-Setup tools:
+## Security & Costs
+- API calls to Gemini incur usage against your Google account.
+- Never commit secrets. Use `.env` locally and secret managers in production.
 
-Retrieve papers via arXiv tool
+## Contributing
+PRs are welcome. For significant changes, open an issue first to discuss scope and design.
 
-Read PDFs using PyPDF2
-
-Write research paper to PDF
-
-Setup LangGraph Agent with LLMs (OpenAI, Gemini, Groq).
-
-Phase 2: Setup Frontend
-
-Build frontend using Streamlit
-
-User can ask questions & input topics
-
-Display AI Agent’s response
-
-Provide downloadable PDF of the research paper
-
-Phase 3: Integration & Testing
-
-Connect Agent with Streamlit frontend
-
-Verify end-to-end workflow
-
-Ensure paper generation & PDF export
-
-🛠️ Tech Stack
-
-Frontend: Streamlit
-
-AI Orchestration: LangChain
-, LangGraph
-
-LLMs: OpenAI, Gemini, Groq
-
-PDF Handling: PyPDF2
-
-Research API: arXiv
-
-📖 Example Workflow
-
-User inputs: "Quantum Computing in Healthcare"
-
-AI Agent retrieves relevant arXiv papers
-
-Extracts and summarizes key findings
-
-Drafts a structured research paper
-
-Outputs a downloadable PDF
-
-.
-
-🤝 Contributing
-
-Pull requests and contributions are welcome! Please open an issue for discussion before submitting major changes.
-
-📜 License
-
+## License
 MIT License © 2025
+
+
