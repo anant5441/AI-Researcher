@@ -1,0 +1,28 @@
+# Core dependencies
+streamlit
+langchain
+langchain-core
+langchain-community
+python-dotenv
+
+# PDF and LaTeX rendering
+pypdf2
+tectonic @ git+https://github.com/tectonic-typesetting/tectonic.git@42171eeade1641d846fef03566d1e26e9c6e3004
+
+# System utilities
+pathlib
+shutilwhich
+subprocess-run
+
+# Date/time handling
+datetime
+
+# Regex and text processing
+regex
+
+# Optional LLM integrations
+openai
+tiktoken
+
+# For logging and safe subprocess
+loguru
