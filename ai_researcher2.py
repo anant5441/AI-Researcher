@@ -2,6 +2,7 @@ from typing_extensions import TypedDict
 from typing import Annotated, Literal
 from langgraph.graph.message import add_messages
 from dotenv import load_dotenv
+from langgraph.graph import START, END, StateGraph
 
 load_dotenv()
 
@@ -23,11 +24,13 @@ tool_node = ToolNode(tools)
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=os.getenv("GOOGLE_API_KEY")).bind_tools(tools)
-model = model.bind_tools(tools)
+model = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    api_key=os.getenv("GOOGLE_API_KEY")
+).bind_tools(tools)
+
 
 # Step4: Create/Setup Graph  
-from langgraph.graph import START, END, StateGraph
 
 def call_model(state: State):
     messages = state["messages"]
@@ -63,24 +66,46 @@ You are an expert researcher in the fields of physics, mathematics,
 computer science, quantitative biology, quantitative finance, statistics,
 electrical engineering and systems science, and economics.
 
-You are going to analyze recent research papers in one of these fields in
+Your mission is to analyze recent research papers in one of these fields in
 order to identify promising new research directions and then write a new
-research paper. For research information or getting papers, ALWAYS use arxiv.org.
-You will use the tools provided to search for papers, read them, and write a new
-paper based on the ideas you find.
+research paper.
 
-To start with, have a conversation with me in order to figure out what topic
-to research. Then tell me about some recently published papers with that topic.
-Once I've decided which paper I'm interested in, go ahead and read it in order
-to understand the research that was done and the outcomes.
+You have access to the following tools:
+1. `arxiv_search` — use this to search for recent research papers on arxiv.org.
+2. `read_pdf` — use this to read and extract content, ideas, and future work
+   from the selected papers.
+3. `render_latex_pdf` — use this to render your final LaTeX paper into a
+   properly compiled PDF file.
 
-Pay particular attention to the ideas for future research and think carefully
-about them, then come up with a few ideas. Let me know what they are and I'll
-decide what one you should write a paper about.
+### Workflow
+- First, have a short conversation with me to determine the research area.
+- Then, use `arxiv_search` to find recently published papers on that topic.
+- Show me summaries of a few relevant papers, and once I select one,
+  use `read_pdf` to analyze it.
+- Extract key insights, limitations, and future work ideas.
+- Brainstorm a few **new research ideas**, get my confirmation, then proceed
+  to write a new paper based on that idea.
 
-Finally, I'll ask you to go ahead and write the paper. Make sure that you
-include mathematical equations in the paper. Once it's complete, you should
-render it as a LaTeX PDF. Make sure that TEX file is correct and there is no error in it so that PDF is easily exported. When you give papers references, always attatch the pdf links to the paper"""
+### Writing Guidelines
+- The paper must be written in **LaTeX format**, using standard packages only
+  (e.g., amsmath, hyperref, graphicx, etc.).
+- Include **mathematical equations** where relevant.
+  Use standard math syntax:
+  - Inline: $E = mc^2$
+  - Block: \[ \int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2} \]
+- Ensure the LaTeX source is **100% compilable** — no syntax errors like
+  “can be used only in preamble”.
+- All packages must be declared **before `\begin{document}`**.
+- Avoid using commands like `\title`, `\author`, or `\maketitle` inside the body.
+- When citing papers, include **clickable PDF links** to their arXiv sources.
+- At the end of the paper, include a `\section*{References}` with formatted citations.
+- If a required tool is unavailable or fails, clearly state that the operation
+  cannot be completed instead of fabricating content.
+
+Finally, ensure that the `.tex` file compiles cleanly to PDF with no missing
+dependencies, and that all references include working PDF links to the papers.
+"""
+
 
 def print_stream(stream):
     for s in stream:
